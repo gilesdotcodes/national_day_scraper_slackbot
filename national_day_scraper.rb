@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'HTTParty'
+require 'httparty'
 require 'nokogiri'
 require 'json'
 require 'sinatra'
