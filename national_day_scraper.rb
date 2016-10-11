@@ -30,13 +30,20 @@ class NationalDay
     output(date)
   end
 
+  def tomorrow
+    date = (Date.today + 1).day - 1
+    output(date, true)
+  end
+
   def day(date)
     output(date - 1)
   end
 
-  def output(date)
+  def output(date, tomorrow=false)
     str = ""
-    str << "#{@main_section.css('h4')[date].text}\n"
+    str << "#{@main_section.css('h4')[date].text}"
+    str << " (tomorrow)" if tomorrow
+    str << "\n"
 
     national_days = @main_section.css(".et_pb_section_#{date/4}").css('.et_pb_blurb_container').css('ul')[(date - (date/4 * 4))].css('li')
 
@@ -62,6 +69,11 @@ end
 post '/national_days' do
   national_day = NationalDay.new
   json national_day.today
+end
+
+post 'national_days_tomorrow' do
+  national_day = NationalDay.new
+  json national_day.tomorrow
 end
 
 
