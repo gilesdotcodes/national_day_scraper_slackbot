@@ -71,7 +71,7 @@ post '/national_days' do
   json national_day.today
 end
 
-post 'national_days_tomorrow' do
+post '/national_days_tomorrow' do
   national_day = NationalDay.new
   json national_day.tomorrow
 end
