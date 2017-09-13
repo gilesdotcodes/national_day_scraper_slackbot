@@ -9,20 +9,22 @@ require 'sinatra/json'
 class NationalDay
 
   def initialize
+    get_national_day_section
+    get_days_of_the_year_section
+  end
+
+  def get_national_day_section
     current_month = Date::MONTHNAMES[Date.today.month]
     page = HTTParty.get("http://www.nationaldaycalendar.com/#{current_month}/")
     parse_page = Nokogiri::HTML(page)
-    @main_section = parse_page.css('.post-wrap')
+    @national_day_section = parse_page.css('.post-wrap')
   end
 
-  def all_month
-    number_of_days = @main_section.css('h4').count.to_i
-
-    #@main_section.css('h1').text
-
-    number_of_days.times do |n|
-      output(n)
-    end
+  def get_days_of_the_year_section
+    # current_month = Date.today.month
+    page = HTTParty.get("http://www.daysoftheyear.com")
+    parse_page = Nokogiri::HTML(page)
+    @days_of_the_year_section = parse_page.css('.mainBanner')
   end
 
   def today
@@ -41,14 +43,22 @@ class NationalDay
 
   def output(date, tomorrow=false)
     str = ""
-    str << "#{@main_section.css('h4')[date].text}"
-    str << " (tomorrow)" if tomorrow
-    str << "\n"
+    str << "National Days for #{@national_day_section.css('h4')[date].text}\n"
 
-    national_days = @main_section.css(".et_pb_section_#{(date/4)+1}").css('.et_pb_blurb_container').css('ul')[(date - (date/4 * 4))].css('li')
+    national_days = @national_day_section.css(".et_pb_section_#{(date/4)+1}").css('.et_pb_blurb_container').css('ul')[(date - (date/4 * 4))].css('li')
 
     national_days.each_with_index do |national_day, i|
       str << "#{i+1}. #{national_day.text}\n"
+    end
+
+    unless tomorrow
+      str << "Days of the Year for #{@national_day_section.css('h4')[date].text}\n"
+
+      days_of_the_year = @days_of_the_year_section.css('h2').css('a')
+
+      days_of_the_year.each_with_index do |day_of_year, i|
+        str << "#{i+1}. #{day_of_year.text}\n"
+      end
     end
 
     make_response(str)
@@ -75,5 +85,3 @@ post '/national_days_tomorrow' do
   national_day = NationalDay.new
   json national_day.tomorrow
 end
-
-
