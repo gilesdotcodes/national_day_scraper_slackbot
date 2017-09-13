@@ -45,7 +45,7 @@ class NationalDay
     str << " (tomorrow)" if tomorrow
     str << "\n"
 
-    national_days = @main_section.css(".et_pb_section_#{date/4}").css('.et_pb_blurb_container').css('ul')[(date - (date/4 * 4))].css('li')
+    national_days = @main_section.css(".et_pb_section_#{(date/4)+1}").css('.et_pb_blurb_container').css('ul')[(date - (date/4 * 4))].css('li')
 
     national_days.each_with_index do |national_day, i|
       str << "#{i+1}. #{national_day.text}\n"
