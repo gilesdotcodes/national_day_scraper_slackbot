@@ -45,7 +45,7 @@ class NationalDay
     str = ""
     str << "Days of the Year for #{@national_day_section.css('h4')[date].text}\n"
 
-    national_days = @national_day_section.css(".et_pb_section_#{(date/4)+1}").css('.et_pb_blurb_container').css('ul')[(date - (date/4 * 4))].css('li').map{ |d| d.text.sub!("National ", "") }
+    national_days = @national_day_section.css(".et_pb_section_#{(date/4)+1}").css('.et_pb_blurb_container').css('ul')[(date - (date/4 * 4))].css('li').map{ |d| d.text.include?("National ") ? d.text.sub!("National ", "") : d.text }
 
 
     unless tomorrow
