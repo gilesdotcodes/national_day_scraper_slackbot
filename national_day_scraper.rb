@@ -43,22 +43,23 @@ class NationalDay
 
   def output(date, tomorrow=false)
     str = ""
-    str << "National Days for #{@national_day_section.css('h4')[date].text}\n"
+    str << "Days of the Year for #{@national_day_section.css('h4')[date].text}\n"
 
-    national_days = @national_day_section.css(".et_pb_section_#{(date/4)+1}").css('.et_pb_blurb_container').css('ul')[(date - (date/4 * 4))].css('li')
+    national_days = @national_day_section.css(".et_pb_section_#{(date/4)+1}").css('.et_pb_blurb_container').css('ul')[(date - (date/4 * 4))].css('li').map{ |d| d.text.sub!("National ", "") }
 
-    national_days.each_with_index do |national_day, i|
-      str << "#{i+1}. #{national_day.text}\n"
-    end
 
     unless tomorrow
-      str << "Days of the Year for #{@national_day_section.css('h4')[date].text}\n"
+      # str << "Days of the Year for #{@national_day_section.css('h4')[date].text}\n"
+      national_days << @days_of_the_year_section.css('h2').css('a').map(&:text)
+      # days_of_the_year = @days_of_the_year_section.css('h2').css('a')
 
-      days_of_the_year = @days_of_the_year_section.css('h2').css('a')
+      # days_of_the_year.each_with_index do |day_of_year, i|
+      #   str << "#{i+1}. #{day_of_year.text}\n"
+      # end
+    end
 
-      days_of_the_year.each_with_index do |day_of_year, i|
-        str << "#{i+1}. #{day_of_year.text}\n"
-      end
+    national_days.flatten.uniq.each do |national_day|
+      str << "- #{national_day}\n"
     end
 
     make_response(str)
