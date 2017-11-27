@@ -42,14 +42,14 @@ class NationalDay
     str << "Days of the Year for #{@current_month} #{date}\n"
 
     section_number = (date % 4 != 0) ? date/4 : (date/4 - 1)
-    list_number = (date % 4 != 0) ? (date % 4 - 1) : 3
+    list_number = (date % 4 != 0) ? (date % 4) : 4
+    list_number -= 1
 
     national_days = @national_day_section.css(".et_pb_section_#{section_number}")
                                          .css('.et_pb_blurb_container')
                                          .css('ul')[list_number]
                                          .css('li')
                                          .map{ |d| d.text.include?("National ") ? d.text.sub!("National ", "") : d.text }
-
 
     unless tomorrow
       # str << "Days of the Year for #{@national_day_section.css('h4')[date].text}\n"
