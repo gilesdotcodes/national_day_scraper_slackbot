@@ -14,8 +14,8 @@ class NationalDay
   end
 
   def get_national_day_section
-    current_month = Date::MONTHNAMES[Date.today.month]
-    page = HTTParty.get("http://www.nationaldaycalendar.com/#{current_month}/")
+    @current_month = Date::MONTHNAMES[Date.today.month]
+    page = HTTParty.get("http://www.nationaldaycalendar.com/#{@current_month}/")
     parse_page = Nokogiri::HTML(page)
     @national_day_section = parse_page.css('.post-wrap')
   end
@@ -28,24 +28,27 @@ class NationalDay
   end
 
   def today
-    date = Date.today.day - 1
+    date = Date.today.day
     output(date)
   end
 
   def tomorrow
-    date = (Date.today + 1).day - 1
+    date = (Date.today + 1).day
     output(date, true)
-  end
-
-  def day(date)
-    output(date - 1)
   end
 
   def output(date, tomorrow=false)
     str = ""
-    str << "Days of the Year for #{@national_day_section.css('h4')[date].text}\n"
+    str << "Days of the Year for #{@current_month} #{date}\n"
 
-    national_days = @national_day_section.css(".et_pb_section_#{(date/4)+1}").css('.et_pb_blurb_container').css('ul')[(date - (date/4 * 4))].css('li').map{ |d| d.text.include?("National ") ? d.text.sub!("National ", "") : d.text }
+    section_number = (date % 4 != 0) ? date/4 : (date/4 - 1)
+    list_number = (date % 4 != 0) ? (date % 4 - 1) : 3
+
+    national_days = @national_day_section.css(".et_pb_section_#{section_number}")
+                                         .css('.et_pb_blurb_container')
+                                         .css('ul')[list_number]
+                                         .css('li')
+                                         .map{ |d| d.text.include?("National ") ? d.text.sub!("National ", "") : d.text }
 
 
     unless tomorrow
