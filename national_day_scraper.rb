@@ -41,7 +41,9 @@ class NationalDay
     str = ""
     str << "Days of the Year for #{@current_month} #{date}\n"
 
-    section_number = (date % 4 != 0) ? date/4 : (date/4 - 1)
+    # different markup changes this line (i think)
+    # section_number = (date % 4 != 0) ? date/4 : (date/4 - 1)
+    section_number = (date % 4 != 0) ? (date/4 + 1) : date/4
     list_number = (date % 4 != 0) ? (date % 4) : 4
     list_number -= 1
 
