@@ -85,7 +85,7 @@ class NationalDay
   def months_output(date)
     "".tap do |str|
       str << "#{Date::MONTHNAMES[date.month]} is:\n"
-      str << @days_of_the_year_month_section.css('h3.card-title').css('a').map(&:text).join("\n")
+      str << @days_of_the_year_month_section.css('h3.card-title').css('a').map{ |a| "- #{a.text}" }.join("\n")
     end
   end
 
