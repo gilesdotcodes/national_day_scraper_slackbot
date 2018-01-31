@@ -7,44 +7,63 @@ require 'sinatra'
 require 'sinatra/json'
 
 class NationalDay
-
   def initialize
-    get_national_day_section
-    get_days_of_the_year_section
   end
 
-  def get_national_day_section
-    @current_month = Date::MONTHNAMES[Date.today.month]
-    page = HTTParty.get("http://www.nationaldaycalendar.com/#{@current_month}/")
+  def today
+    anyday(Date.today)
+  end
+
+  def tomorrow
+    anyday(Date.today + 1)
+  end
+
+  def month
+    get_days_of_the_year_months(Date.today)
+
+    make_response(months_output(Date.today))
+  end
+
+  private
+
+  def get_national_day_section(month)
+    @month_string = Date::MONTHNAMES[month]
+    page = HTTParty.get("http://www.nationaldaycalendar.com/#{@month_string}/")
     parse_page = Nokogiri::HTML(page)
     @national_day_section = parse_page.css('.post-wrap')
   end
 
-  def get_days_of_the_year_section
-    # current_month = Date.today.month
-    page = HTTParty.get("http://www.daysoftheyear.com")
-    parse_page = Nokogiri::HTML(page)
-    @days_of_the_year_section = parse_page.css('.mainBanner')
+  def get_days_of_the_year_days(date)
+    parse_page = Nokogiri::HTML(days_of_the_year_page(date))
+    @days_of_the_year_days_section = parse_page.css('section>div.container.breathe')
   end
 
-  def today
-    date = Date.today.day
-    output(date)
+  def get_days_of_the_year_months(date)
+    parse_page = Nokogiri::HTML(days_of_the_year_page(date))
+    @days_of_the_year_month_section = parse_page.css('section.breathe--light>div.container')
   end
 
-  def tomorrow
-    date = (Date.today + 1).day
-    output(date, true)
+  def days_of_the_year_page(date)
+    HTTParty.get("http://www.daysoftheyear.com/days/#{date.year}/#{("%02d" % date.month)}/#{("%02d" % date.day)}")
   end
 
-  def output(date, tomorrow=false)
+  def anyday(date)
+    @date = date
+    get_national_day_section(@date.month)
+    get_days_of_the_year_days(@date)
+    make_response(days_output(@date))
+  end
+
+  def days_output(date)
+    day = date.day
     str = ""
-    str << "Days of the Year for #{@current_month} #{date}\n"
+    str << "Days of the Year for #{@month_string} #{day}\n"
 
     # different markup changes this line (i think)
-    # section_number = (date % 4 != 0) ? date/4 : (date/4 - 1)
-    section_number = (date % 4 != 0) ? (date/4 + 1) : date/4
-    list_number = (date % 4 != 0) ? (date % 4) : 4
+    # ok so the first line should work if the section numbers start at _0
+    section_number = (day % 4 != 0) ? day/4 : (day/4 - 1)
+    # section_number = (day % 4 != 0) ? (day/4 + 1) : day/4
+    list_number = (day % 4 != 0) ? (day % 4) : 4
     list_number -= 1
 
     national_days = @national_day_section.css(".et_pb_section_#{section_number}")
@@ -53,21 +72,21 @@ class NationalDay
                                          .css('li')
                                          .map{ |d| d.text.include?("National ") ? d.text.sub!("National ", "") : d.text }
 
-    unless tomorrow
-      # str << "Days of the Year for #{@national_day_section.css('h4')[date].text}\n"
-      national_days << @days_of_the_year_section.css('h2').css('a').map(&:text)
-      # days_of_the_year = @days_of_the_year_section.css('h2').css('a')
 
-      # days_of_the_year.each_with_index do |day_of_year, i|
-      #   str << "#{i+1}. #{day_of_year.text}\n"
-      # end
-    end
+    national_days << @days_of_the_year_days_section.css('h3.card-title').css('a').map(&:text)
 
     national_days.flatten.uniq.each do |national_day|
       str << "- #{national_day}\n"
     end
 
-    make_response(str)
+    str
+  end
+
+  def months_output(date)
+    "".tap do |str|
+      str << "#{Date::MONTHNAMES[date.month]} is:\n"
+      str << @days_of_the_year_month_section.css('h3.card-title').css('a').map(&:text).join("\n")
+    end
   end
 
   def make_response(text, attachments = [], response_type = 'in_channel')
@@ -90,4 +109,9 @@ end
 post '/national_days_tomorrow' do
   national_day = NationalDay.new
   json national_day.tomorrow
+end
+
+post '/national_months' do
+  national_day = NationalDay.new
+  json national_day.month
 end
