@@ -30,7 +30,7 @@ class NationalDay
     @month_string = Date::MONTHNAMES[month]
     page = HTTParty.get("http://www.nationaldaycalendar.com/#{@month_string}/")
     parse_page = Nokogiri::HTML(page)
-    @national_day_section = parse_page.css('.post-wrap')
+    @national_day_section = parse_page.css('.entry-content')
   end
 
   def get_days_of_the_year_days(date)
