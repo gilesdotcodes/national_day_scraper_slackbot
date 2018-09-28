@@ -75,7 +75,7 @@ class NationalDay
 
     national_days << @days_of_the_year_days_section.css('h3.card-title').css('a').map(&:text)
     national_days << ["Giles Appreciation Day"] if day == 27 && @month_string == 'April'
-    national_days << ["Waistcoat Wednesday - It's coming home!"] if day == 11 && @month_string == 'July'
+    national_days << ["Al Hates Marmite Day"] if day == 28 && @month_string == 'September'
 
     national_days.flatten.uniq(&:downcase).each do |national_day|
       str << "- #{national_day}\n"
