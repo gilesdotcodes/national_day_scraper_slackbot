@@ -61,8 +61,8 @@ class NationalDay
 
     # different markup changes this line (i think)
     # ok so the first line should work if the section numbers start at _0
-    section_number = (day % 4 != 0) ? day/4 : (day/4 - 1)
-    # section_number = (day % 4 != 0) ? (day/4 + 1) : day/4
+    # section_number = (day % 4 != 0) ? day/4 : (day/4 - 1)
+    section_number = (day % 4 != 0) ? (day/4 + 1) : day/4
     list_number = (day % 4 != 0) ? (day % 4) : 4
     list_number -= 1
 
