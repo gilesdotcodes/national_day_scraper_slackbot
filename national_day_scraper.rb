@@ -95,15 +95,18 @@ end
 
 post '/national_days' do
   national_day = NationalDay.new
-  json national_day.today
+  content_type :json
+  national_day.today.to_json
 end
 
 post '/national_days_tomorrow' do
   national_day = NationalDay.new
-  json national_day.tomorrow
+  content_type :json
+  national_day.tomorrow.to_json
 end
 
 post '/national_months' do
   national_day = NationalDay.new
-  json national_day.month
+  content_type :json
+  national_day.month.to_json
 end
