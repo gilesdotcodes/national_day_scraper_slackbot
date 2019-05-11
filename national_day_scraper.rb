@@ -4,7 +4,6 @@ require 'httparty'
 require 'nokogiri'
 require 'json'
 require 'sinatra'
-require 'sinatra/json'
 
 class NationalDay
   def initialize
@@ -28,23 +27,23 @@ class NationalDay
 
   def get_national_day_section(month)
     @month_string = Date::MONTHNAMES[month]
-    page = HTTParty.get("http://www.nationaldaycalendar.com/#{@month_string}/")
+    page = HTTParty.get("https://nationaldaycalendar.com/#{@month_string}/")
     parse_page = Nokogiri::HTML(page)
-    @national_day_section = parse_page.css('.entry-content')
+    @national_day_section = parse_page.css('.et_pb_section_1').css('.et_pb_text_inner')
   end
 
   def get_days_of_the_year_days(date)
     parse_page = Nokogiri::HTML(days_of_the_year_page(date))
-    @days_of_the_year_days_section = parse_page.css('section>div.container.breathe')
+    @days_of_the_year_days_section = parse_page.css('section>div.container.breathe').first
   end
 
   def get_days_of_the_year_months(date)
     parse_page = Nokogiri::HTML(days_of_the_year_page(date))
-    @days_of_the_year_month_section = parse_page.css('section.breathe--light>div.container')
+    @days_of_the_year_month_section = parse_page.css('section>div.container.breathe').last
   end
 
   def days_of_the_year_page(date)
-    HTTParty.get("http://www.daysoftheyear.com/days/#{date.year}/#{("%02d" % date.month)}/#{("%02d" % date.day)}")
+    HTTParty.get("https://www.daysoftheyear.com/days/#{date.year}/#{("%02d" % date.month)}/#{("%02d" % date.day)}")
   end
 
   def anyday(date)
@@ -59,16 +58,7 @@ class NationalDay
     str = ""
     str << "Days of the Year for #{@month_string} #{day}\n"
 
-    # different markup changes this line (i think)
-    # ok so the first line should work if the section numbers start at _0
-    # section_number = (day % 4 != 0) ? day/4 : (day/4 - 1)
-    section_number = (day % 4 != 0) ? (day/4 + 1) : day/4
-    list_number = (day % 4 != 0) ? (day % 4) : 4
-    list_number -= 1
-
-    national_days = @national_day_section.css(".et_pb_section_#{section_number}")
-                                         .css('.et_pb_blurb_container')
-                                         .css('ul')[list_number]
+    national_days = @national_day_section.css('ul')[day - 1]
                                          .css('li')
                                          .map{ |d| d.text.include?("National ") ? d.text.sub!("National ", "") : d.text }
 
