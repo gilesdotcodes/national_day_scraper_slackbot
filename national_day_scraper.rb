@@ -34,7 +34,7 @@ class NationalDay
 
   def get_days_of_the_year_days(date)
     parse_page = Nokogiri::HTML(days_of_the_year_page(date))
-    @days_of_the_year_days_section = parse_page.css('section>div.container.breathe').first
+    @days_of_the_year_days_section = parse_page.css('.card-block')
   end
 
   def get_days_of_the_year_months(date)
@@ -63,7 +63,7 @@ class NationalDay
                                          .map{ |d| d.text.include?("National ") ? d.text.sub!("National ", "") : d.text }
 
 
-    national_days << @days_of_the_year_days_section.css('h3.card-title').css('a').map(&:text)
+    national_days << @days_of_the_year_days_section.css('h3.card-title').css('a').map(&:text).keep_if{ |c| c =~ /Day/ }
     national_days << ["Giles Appreciation Day"] if day == 27 && @month_string == 'April'
     national_days << ["Al Hates Marmite Day"] if day == 28 && @month_string == 'September'
 
