@@ -6,7 +6,7 @@ GEM
     mini_portile2 (2.4.0)
     multi_xml (0.6.0)
     mustermann (1.0.3)
-    nokogiri (1.10.3)
+    nokogiri (1.10.4)
       mini_portile2 (~> 2.4.0)
     rack (2.0.7)
     rack-protection (2.0.5)
@@ -23,7 +23,7 @@ PLATFORMS
 
 DEPENDENCIES
   httparty (= 0.14)
-  nokogiri (~> 1.6, >= 1.6.8)
+  nokogiri (~> 1.10)
   sinatra (~> 2.0)
 
 RUBY VERSION
